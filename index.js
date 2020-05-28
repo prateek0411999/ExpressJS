@@ -90,7 +90,60 @@ app.get('/api/courses/:id',(req,res)=>{
     
 });
 
+// app.post('/api/courses',(req,res)=>{
+
+//     if(!req.body.name || req.body.name.length)
+//     {
+//         //400- bad request 
+//         res.status(400).send('Name is required and must be of atleast 3 characters')
+//     }
+//     const course={
+//         id: courses.length+id,
+//         //now to get the name from the body of the url
+//         //we use 
+//         //req.body.name - but the thing is we can't use this property of request directly in expres
+//         //so we need to parse it to json object 
+//         name: req.body.name
+
+//     };
+//     courses.push(course);
+//     res.send(course);
+
+// });
+
+//but in the above case this kind of validation is enough for the less data entry in the objects of a collection
+//so we use Joi validation
+//it makes the validation process super ez
+
+const Joi= require('joi');
+//yeh class hh toh first letter captical J
+//first we need to define the schema
+
+
+
+
+
 app.post('/api/courses',(req,res)=>{
+
+    //we need a schema so that Joi can validate 
+    // const schema = {
+    //     name: Joi.string().min(3).required()
+
+    // };
+    // const result = Joi.validate(req.body, schema);
+
+    //we've have defined a funcion for this validation
+    //so
+    const result= validateCourse(req.body);
+    //if we do it like above then we we third joi validate for almost all the post and put requests
+   //so for that we'll create a function and then validate 
+    console.log(result);
+
+    if(result.error)
+    {
+        //400- bad request 
+        res.status(400).send(result.error);
+    }
     const course={
         id: courses.length+id,
         //now to get the name from the body of the url
@@ -102,5 +155,76 @@ app.post('/api/courses',(req,res)=>{
     };
     courses.push(course);
     res.send(course);
+
+});
+
+app.put('/api/courses/:id',(req,res)=>{
+    //look up the course
+    //if not existing, return 404
+    const course=   courses.find((x)=>{
+        //x.id ===req.param.id
+        //the thing is req.param.id gives us the string so we need to parse it
+        x.id === parseInt(req.params.id)
+    })
+    if(!course)
+    {
+        //this is one of the convention of the restful api's 
+        res.status(404).send('The course with the given id not found');
+
+    }
+
+
+    //validate
+    //if invalid, return 400 - bad request
+    // const schema = {
+    //     name: Joi.string().min(3).required()
+
+    // };
+    //const result = Joi.validate(req.body, schema);
+    const result = validateCourse(req.body);
+
+    if(result.error)
+    {
+        //400- bad request 
+        res.status(400).send(result.error);
+    }
+
+    //update course
+    course.name =req.body.name;
+
+    //return the updated course
+    res.send(course);
+});
+
+function validateCourse(course)
+{
+    const schema = {
+             name: Joi.string().min(3).required()
+    
+         };
+    return Joi.validate(req.body, schema);
+
+}
+
+app.delete('/api/courses/:id',(req,res)=>{
+    //look up for the course
+    const course=   courses.find((x)=>{
+        //x.id ===req.param.id
+        //the thing is req.param.id gives us the string so we need to parse it
+        x.id === parseInt(req.params.id)
+    })
+    if(!course)
+    {
+        //this is one of the convention of the restful api's 
+        res.status(404).send('The course with the given id not found');
+
+    }
+
+    //delete- using the splice function 
+    const index =courses.indexOf(course);
+    courses.splice(index,1);
+
+    res.send(course);
+    //not existing return 404
 
 })
