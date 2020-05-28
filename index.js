@@ -82,7 +82,7 @@ app.get('/api/courses/:id',(req,res)=>{
     {
         //this is one of the convention of the restful api's 
         res.status(404).send('The course with the given id not found');
-
+        return;
     }else{
         res.send(course);
         //json object to the user
@@ -143,6 +143,8 @@ app.post('/api/courses',(req,res)=>{
     {
         //400- bad request 
         res.status(400).send(result.error);
+        return;
+
     }
     const course={
         id: courses.length+id,
@@ -170,7 +172,8 @@ app.put('/api/courses/:id',(req,res)=>{
     {
         //this is one of the convention of the restful api's 
         res.status(404).send('The course with the given id not found');
-
+        return;
+        
     }
 
 
